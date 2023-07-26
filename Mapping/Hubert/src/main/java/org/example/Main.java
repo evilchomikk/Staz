@@ -15,9 +15,6 @@ public class Main {
         manager.readEmplyeeData("Employee");
         manager.saveEmployeeData("xd1");
 
-        System.out.println(Mappers.getMapper(EmployeeDtoToEmployeeMapperimp.class).employeeDtoToEmployee(
-                EmployeeDTO.builder().name("Jan").lastName("Kowalksi").salary(20).build()
-        ));
 
         System.out.println( new EmployeeDtoToEmployeeMapperImpl().employeeDtoToEmployee(
                 EmployeeDTO.builder().name("Jan").lastName("Kowalksi").salary(20).build()
