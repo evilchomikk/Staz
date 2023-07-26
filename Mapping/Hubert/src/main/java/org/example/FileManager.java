@@ -47,7 +47,7 @@ public class FileManager {
 
                 employeeData.add(mapper.employeeDtoToEmployee(employeeDTO));
             }
-            System.out.println(employeeData.getEmployeeList());
+
             reader.close();
         }
 
@@ -66,8 +66,6 @@ public class FileManager {
                     .map(mapper::employeeToEmployeeDto)
                     .forEach(employeeDTO -> {
                         try {
-                            System.out.println(employeeDTO);
-                            System.out.println(employeeDTO.getName()+" ");
                             writer.write(employeeDTO.getName()+" ");
                             writer.write(employeeDTO.getLastName()+" ");
                             writer.write(String.valueOf( employeeDTO.getSalary()));
