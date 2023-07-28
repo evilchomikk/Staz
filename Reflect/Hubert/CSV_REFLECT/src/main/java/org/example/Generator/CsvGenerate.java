@@ -35,9 +35,10 @@ public class CsvGenerate implements CsvGenerator<Object> {
             this.csvData = new CsvData<>(list);
 
             System.out.println();
-
-            getColTitles(writer);
-            getRowValues(writer);
+            if (!csvData.getListOfObjects().get(0).getClass().isAnnotationPresent(DontGenerate.class)) {
+                getColTitles(writer);
+                getRowValues(writer);
+            }
         }
         //scan.close();
         writer.close();
@@ -51,14 +52,14 @@ public class CsvGenerate implements CsvGenerator<Object> {
 
 
         classFields.forEach(field -> {
-            if (!csvData.getListOfObjects().get(0).getClass().isAnnotationPresent(DontGenerate.class))
-                if (!field.isAnnotationPresent(IgnoreField.class))
-                    if (csvData.getListOfObjects().get(0).getClass().isAnnotationPresent(IgnoreInnerLists.class)) {
-                        if (!field.getType().equals(List.class))
-                            colTitle.append(field.getName()).append(", ");
-                    } else {
+
+            if (!field.isAnnotationPresent(IgnoreField.class))
+                if (csvData.getListOfObjects().get(0).getClass().isAnnotationPresent(IgnoreInnerLists.class)) {
+                    if (!field.getType().equals(List.class))
                         colTitle.append(field.getName()).append(", ");
-                    }
+                } else {
+                    colTitle.append(field.getName()).append(", ");
+                }
 
 
         });
@@ -78,64 +79,63 @@ public class CsvGenerate implements CsvGenerator<Object> {
         GetAmmount getAmmount;
         // Field sortByField = null;
 
-        if (!csvData.getListOfObjects().get(0).getClass().isAnnotationPresent(DontGenerate.class))
-            csvData.getListOfObjects().forEach(obj -> {
-                StringBuilder sb = new StringBuilder();
-                LocalDate date = null;
-                for (Field field : obj.getClass().getDeclaredFields()) {
-                    Object fieldValue;
+
+        csvData.getListOfObjects().forEach(obj -> {
+            StringBuilder sb = new StringBuilder();
+            LocalDate date = null;
+            for (Field field : obj.getClass().getDeclaredFields()) {
+                Object fieldValue;
 
 
-                    try {
-                        field.setAccessible(true);
-                        fieldValue = field.get(obj);
+                try {
+                    field.setAccessible(true);
+                    fieldValue = field.get(obj);
 
-                        if (csvData.getListOfObjects().get(0).getClass().isAnnotationPresent(NullsEquals.class))
-                            if (fieldValue == null)
-                                fieldValue = csvData.getListOfObjects().get(0).getClass().getAnnotation(NullsEquals.class).nullValue();
+                    if (csvData.getListOfObjects().get(0).getClass().isAnnotationPresent(NullsEquals.class))
+                        if (fieldValue == null)
+                            fieldValue = csvData.getListOfObjects().get(0).getClass().getAnnotation(NullsEquals.class).nullValue();
 
 
-                    } catch (IllegalAccessException e) {
-                        throw new RuntimeException(e);
-                    }
+                } catch (IllegalAccessException e) {
+                    throw new RuntimeException(e);
+                }
 
-                    if (!field.isAnnotationPresent(IgnoreField.class))
-                        if (field.getType().equals(List.class)) {
-                            if (!obj.getClass().isAnnotationPresent(IgnoreInnerLists.class)) {
-                                sb.append(fieldValue).append(", ");
-                            }
-                        } else if (field.getType().equals(LocalDate.class)) {
-                            if (obj.getClass().isAnnotationPresent(DateFormat.class)) {
-                                date = (LocalDate) fieldValue;
-                                DateTimeFormatter formatter = DateTimeFormatter.ofPattern(obj.getClass().getAnnotation(DateFormat.class).dateFormat());
-                                fieldValue= formatter.format(date);
-                                sb.append(fieldValue.toString()).append(", ");
-                            }
-                            else {
-                                sb.append(fieldValue).append(", ");
-                            }
+                if (!field.isAnnotationPresent(IgnoreField.class))
+                    if (field.getType().equals(List.class)) {
+                        if (!obj.getClass().isAnnotationPresent(IgnoreInnerLists.class)) {
+                            sb.append(fieldValue).append(", ");
+                        }
+                    } else if (field.getType().equals(LocalDate.class)) {
+                        if (obj.getClass().isAnnotationPresent(DateFormat.class)) {
+                            date = (LocalDate) fieldValue;
+                            DateTimeFormatter formatter = DateTimeFormatter.ofPattern(obj.getClass().getAnnotation(DateFormat.class).dateFormat());
+                            fieldValue = formatter.format(date);
+                            sb.append(fieldValue.toString()).append(", ");
                         } else {
                             sb.append(fieldValue).append(", ");
                         }
-                }
+                    } else {
+                        sb.append(fieldValue).append(", ");
+                    }
+            }
 
 
-                if (sb.length() > 2) {
-                    sb.setLength(sb.length() - 2);
-                }
-                sb.append("\r");
-                try {
-                    writer.write(sb.toString());
-                } catch (IOException e) {
-                    throw new RuntimeException(e);
-                }
-                System.out.println(sb);
+            if (sb.length() > 2) {
+                sb.setLength(sb.length() - 2);
+            }
+            sb.append("\r");
+            try {
+                writer.write(sb.toString());
+            } catch (IOException e) {
+                throw new RuntimeException(e);
+            }
+            System.out.println(sb);
 
-            });
+        });
     }
 
 
-    public void read(Object obj,String sourceLoc) throws IOException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    public void read(Object obj, String sourceLoc) throws IOException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
 
         FileReader scan = new FileReader(sourceLoc + ".csv");
         BufferedReader reader = new BufferedReader(scan);
@@ -147,19 +147,18 @@ public class CsvGenerate implements CsvGenerator<Object> {
         Class[] niewiem = constructor.getParameterTypes();
 
 
-         while((line=reader.readLine())!=null) {
-             String[] splitedLine = line.split(",");
-             System.out.println((Arrays.toString(splitedLine)));
+        while ((line = reader.readLine()) != null) {
+            String[] splitedLine = line.split(",");
+            System.out.println((Arrays.toString(splitedLine)));
 
-             System.out.println( constructor.newInstance());
-
-
-             //JAK WSTAWIC W ARGUMENTY TA TABLICE PODZIELONA
+            System.out.println(constructor.newInstance());
 
 
+            //JAK WSTAWIC W ARGUMENTY TA TABLICE PODZIELONA
 
-         }
-         reader.close();
+
+        }
+        reader.close();
     }
 
 }
