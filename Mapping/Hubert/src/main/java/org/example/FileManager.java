@@ -1,15 +1,9 @@
 package org.example;
 
-import com.google.common.collect.Lists;
-import lombok.AllArgsConstructor;
-
 
 import java.io.*;
-import java.nio.file.Files;
+
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
 
 
 public class FileManager {
@@ -47,7 +41,7 @@ public class FileManager {
 
                 employeeData.add(mapper.employeeDtoToEmployee(employeeDTO));
             }
-
+            System.out.println(employeeData.getEmployeeList());
             reader.close();
         }
 
@@ -66,9 +60,9 @@ public class FileManager {
                     .map(mapper::employeeToEmployeeDto)
                     .forEach(employeeDTO -> {
                         try {
-                            writer.write(employeeDTO.getName()+" ");
-                            writer.write(employeeDTO.getLastName()+" ");
-                            writer.write(String.valueOf( employeeDTO.getSalary()));
+                            writer.write(employeeDTO.getName() + " ");
+                            writer.write(employeeDTO.getLastName() + " ");
+                            writer.write(String.valueOf(employeeDTO.getSalary()));
                             writer.write("\r");
                         } catch (IOException e) {
                             throw new RuntimeException(e);
@@ -77,5 +71,11 @@ public class FileManager {
 
         }
         writer.close();
+    }
+
+    public void clearEmployeeRam() {
+        employeeData.getEmployeeList().clear();
+
+
     }
 }
