@@ -34,7 +34,7 @@ public class Main {
 
         //@IgnoreLists
         CsvGenerate generator = new CsvGenerate();
-        //generator.generate(listOfEemployee,"C:\\Users\\kulkah\\Desktop\\pliki\\jakasnazwa");
-        generator.read(new Employee(),"C:\\Users\\kulkah\\Desktop\\pliki\\jakasnazwa");
+        generator.generate(listOfEemployee,"C:\\Users\\kulkah\\Desktop\\pliki\\jakasnazwa");
+        //generator.read(new Employee(),"C:\\Users\\kulkah\\Desktop\\pliki\\jakasnazwa");
     }
 }

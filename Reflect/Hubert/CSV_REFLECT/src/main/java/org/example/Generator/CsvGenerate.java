@@ -35,9 +35,10 @@ public class CsvGenerate implements CsvGenerator<Object> {
             this.csvData = new CsvData<>(list);
 
             System.out.println();
-
-            getColTitles(writer);
-            getRowValues(writer);
+            if (!csvData.getListOfObjects().get(0).getClass().isAnnotationPresent(DontGenerate.class)){
+                getColTitles(writer);
+                getRowValues(writer);
+            }
         }
         //scan.close();
         writer.close();
@@ -51,7 +52,7 @@ public class CsvGenerate implements CsvGenerator<Object> {
 
 
         classFields.forEach(field -> {
-            if (!csvData.getListOfObjects().get(0).getClass().isAnnotationPresent(DontGenerate.class))
+
                 if (!field.isAnnotationPresent(IgnoreField.class))
                     if (csvData.getListOfObjects().get(0).getClass().isAnnotationPresent(IgnoreInnerLists.class)) {
                         if (!field.getType().equals(List.class))
@@ -59,7 +60,6 @@ public class CsvGenerate implements CsvGenerator<Object> {
                     } else {
                         colTitle.append(field.getName()).append(", ");
                     }
-
 
         });
 
@@ -78,7 +78,6 @@ public class CsvGenerate implements CsvGenerator<Object> {
         GetAmmount getAmmount;
         // Field sortByField = null;
 
-        if (!csvData.getListOfObjects().get(0).getClass().isAnnotationPresent(DontGenerate.class))
             csvData.getListOfObjects().forEach(obj -> {
                 StringBuilder sb = new StringBuilder();
                 LocalDate date = null;
