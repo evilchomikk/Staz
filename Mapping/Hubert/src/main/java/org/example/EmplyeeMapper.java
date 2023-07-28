@@ -1,7 +1,8 @@
 package org.example;
 
-import java.security.SecureRandom;
+import org.mapstruct.Mapper;
 
+import java.security.SecureRandom;
 public class EmplyeeMapper implements EmployeeDtoToEmployeeMapper{
     private static final SecureRandom random = new SecureRandom();
     @Override

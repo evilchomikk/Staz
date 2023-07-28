@@ -1,11 +1,8 @@
 package org.example;
 
-import org.mapstruct.factory.Mappers;
 
-import java.io.File;
-import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.util.Scanner;
+
 
 public class Main {
     public static void main(String[] args) throws IOException {
@@ -13,13 +10,22 @@ public class Main {
         FileManager manager = new FileManager();
 
         manager.readEmplyeeData("Employee");
-        manager.saveEmployeeData("xd1");
+        manager.readEmplyeeData("Employee");
+        manager.readEmplyeeData("Employee");
+        manager.readEmplyeeData("Employee");
+        manager.readEmplyeeData("Employee");
+        manager.readEmplyeeData("Employee");
+        manager.readEmplyeeData("Employee");
+        manager.readEmplyeeData("Employee");
+        manager.readEmplyeeData("Employee");
+        manager.clearEmployeeRam();
+        manager.saveEmployeeData("xd2");
 
 
-        System.out.println( new EmployeeDtoToEmployeeMapperImpl().employeeDtoToEmployee(
+        System.out.println(new EmployeeDtoToEmployeeMapperImpl().employeeDtoToEmployee(
                 EmployeeDTO.builder().name("Jan").lastName("Kowalksi").salary(20).build()
         ));
-
+        long i = 1000000000;
 
     }
 }
