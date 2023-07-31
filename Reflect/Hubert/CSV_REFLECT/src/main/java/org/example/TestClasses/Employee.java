@@ -14,7 +14,7 @@ import java.util.*;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-//@DontGenerate
+////@DontGenerate
 //@IgnoreInnerLists
 @NullsEquals(nullValue = "NIEDZIAŁA TUTAJ")
 @DateFormat(dateFormat = "dd-yyyy-MM")
@@ -25,4 +25,6 @@ public class Employee {
     private Integer id;
     List<String> role;
     LocalDate dateOfEmployment;
+
+
 }

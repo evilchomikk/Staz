@@ -1,9 +1,12 @@
 package org.example;
 
+import org.checkerframework.checker.units.qual.C;
 import org.example.Generator.CsvGenerate;
 import org.example.TestClasses.Animal;
+import org.example.TestClasses.Cat;
 import org.example.TestClasses.Employee;
 
+import java.awt.*;
 import java.io.IOException;
 import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
@@ -25,16 +28,16 @@ public class Main {
 
 
         List listOfAnimals = List.of(
-                new Animal("Pies", 4),
-                new Animal("Kangur", 2),
-                new Animal("Kot", 4),
-                new Animal("Chomik", 4),
-                new Animal("Niewiem", 3)
+                new Cat(true,"Pies", 4, Color.BLACK),
+                new Cat(true,"Kangur", 2,Color.BLUE),
+                new Cat(true,"Kot", 4,Color.CYAN),
+                new Cat(false,"Chomik", 4,Color.GRAY),
+                new Cat(false,"Niewiem", 3,Color.green)
         );
 
         //@IgnoreLists
         CsvGenerate generator = new CsvGenerate();
-        //generator.generate(listOfEemployee,"C:\\Users\\kulkah\\Desktop\\pliki\\jakasnazwa");
-        generator.read(new Employee(),"C:\\Users\\kulkah\\Desktop\\pliki\\jakasnazwa");
+        generator.generate(listOfAnimals,"C:\\Users\\kulkah\\Desktop\\pliki\\jakasnazwa");
+       // generator.read(new Cat(),"C:\\Users\\kulkah\\Desktop\\pliki\\jakasnazwa");
     }
 }

@@ -3,20 +3,16 @@ package org.example.Generator;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import org.checkerframework.checker.units.qual.C;
 import org.example.Annotations.*;
 
-import javax.swing.*;
-import javax.swing.text.DateFormatter;
 import java.io.*;
 import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
 import java.lang.reflect.InvocationTargetException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -24,7 +20,7 @@ import java.util.*;
 public class CsvGenerate implements CsvGenerator<Object> {
 
     CsvData<?> csvData;
-
+    private List<Field> classFields;
     @Override
     public void generate(List list, String targetLoc) throws IOException {
 
@@ -35,7 +31,7 @@ public class CsvGenerate implements CsvGenerator<Object> {
             this.csvData = new CsvData<>(list);
 
             System.out.println();
-
+            getFields();
             getColTitles(writer);
             getRowValues(writer);
         }
@@ -46,8 +42,6 @@ public class CsvGenerate implements CsvGenerator<Object> {
 
     public void getColTitles(BufferedWriter writer) throws IOException {
         StringBuilder colTitle = new StringBuilder();
-
-        List<Field> classFields = List.of(csvData.getListOfObjects().get(0).getClass().getDeclaredFields());
 
 
         classFields.forEach(field -> {
@@ -78,11 +72,15 @@ public class CsvGenerate implements CsvGenerator<Object> {
         GetAmmount getAmmount;
         // Field sortByField = null;
 
+
+
+
+
         if (!csvData.getListOfObjects().get(0).getClass().isAnnotationPresent(DontGenerate.class))
             csvData.getListOfObjects().forEach(obj -> {
                 StringBuilder sb = new StringBuilder();
                 LocalDate date = null;
-                for (Field field : obj.getClass().getDeclaredFields()) {
+                for (Field field : classFields) {  // tu zmiana
                     Object fieldValue;
 
 
@@ -108,10 +106,9 @@ public class CsvGenerate implements CsvGenerator<Object> {
                             if (obj.getClass().isAnnotationPresent(DateFormat.class)) {
                                 date = (LocalDate) fieldValue;
                                 DateTimeFormatter formatter = DateTimeFormatter.ofPattern(obj.getClass().getAnnotation(DateFormat.class).dateFormat());
-                                fieldValue= formatter.format(date);
+                                fieldValue = formatter.format(date);
                                 sb.append(fieldValue.toString()).append(", ");
-                            }
-                            else {
+                            } else {
                                 sb.append(fieldValue).append(", ");
                             }
                         } else {
@@ -135,31 +132,69 @@ public class CsvGenerate implements CsvGenerator<Object> {
     }
 
 
-    public void read(Object obj,String sourceLoc) throws IOException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    public void read(Object obj, String sourceLoc) throws IOException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
 
         FileReader scan = new FileReader(sourceLoc + ".csv");
         BufferedReader reader = new BufferedReader(scan);
 
-        Class aClass = obj.getClass();
-
-        String line = reader.readLine();//omija 1 linie
-        Constructor constructor = aClass.getConstructor();
-        Class[] niewiem = constructor.getParameterTypes();
-
-
-         while((line=reader.readLine())!=null) {
-             String[] splitedLine = line.split(",");
-             System.out.println((Arrays.toString(splitedLine)));
-
-             System.out.println( constructor.newInstance());
+        Class<?> aClass = obj.getClass();
+        Field[] fields = aClass.getDeclaredFields();
+        Constructor<?>[] constructor = aClass.getConstructors();
+        var line = reader.readLine();//omija 1 linie
+        Class[] niewiem = constructor[0].getParameterTypes();
 
 
-             //JAK WSTAWIC W ARGUMENTY TA TABLICE PODZIELONA
+        while ((line = reader.readLine()) != null) {
+            String[] splitedLine = line.split(", ");
+            System.out.println((Arrays.toString(splitedLine)));
+            List<Object> splitedLineList = new ArrayList<>();
 
 
+            for (int i = 0; i < fields.length; i++) {
+                splitedLineList.add(convertValue(fields[i].getType(), splitedLine[i]));
+            }
 
-         }
-         reader.close();
+            System.out.println(splitedLineList);
+            System.out.println( constructor[0].newInstance(splitedLineList.get(0),splitedLineList.get(1),splitedLineList.get(2),splitedLineList.get(3)));
+
+
+            //JAK WSTAWIC W ARGUMENTY TA TABLICE PODZIELONA
+
+
+        }
+        reader.close();
     }
 
+    private Object convertValue(Class<?> fieldType, String value) {
+        try {
+            if (fieldType == int.class || fieldType == Integer.class) {
+                return Integer.parseInt(value);
+            } else if (fieldType == double.class || fieldType == Double.class) {
+                return Double.parseDouble(value);
+            } else if (fieldType == boolean.class || fieldType == Boolean.class) {
+                return Boolean.parseBoolean(value);
+            } else if (fieldType == String.class) {
+                return String.valueOf(value);
+                // For other types, you might need additional handling
+                // For this example, we assume all other fields are of type String
+            } else {
+                return null;
+            }
+        }catch (Exception e){
+            return null;
+        }
+
+    }
+    private void getFields(){
+        classFields = new ArrayList<>(List.of(csvData.getListOfObjects().get(0).getClass().getDeclaredFields()));
+        List<Field> superClassFields ;
+
+        Class supeClass = csvData.getListOfObjects().get(0).getClass().getSuperclass();
+        while(supeClass != Object.class){
+            superClassFields = List.of(supeClass.getDeclaredFields());
+            classFields.addAll(superClassFields);
+            supeClass = supeClass.getSuperclass();
+        }
+    }
 }
+
