@@ -106,6 +106,7 @@ public class CsvGenerate implements CsvGenerator<Object> {
                             sb.append(fieldValue).append(", ");
                         }
                     } else if (field.getType().equals(LocalDate.class)) {
+
                         if (obj.getClass().isAnnotationPresent(DateFormat.class)) {
                             date = (LocalDate) fieldValue;
                             DateTimeFormatter formatter = DateTimeFormatter.ofPattern(obj.getClass().getAnnotation(DateFormat.class).dateFormat());
@@ -114,6 +115,7 @@ public class CsvGenerate implements CsvGenerator<Object> {
                         } else {
                             sb.append(fieldValue).append(", ");
                         }
+
                     } else {
                         sb.append(fieldValue).append(", ");
                     }
