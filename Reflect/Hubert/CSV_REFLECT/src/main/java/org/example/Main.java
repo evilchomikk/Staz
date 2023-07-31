@@ -38,6 +38,6 @@ public class Main {
         //@IgnoreLists
         CsvGenerate generator = new CsvGenerate();
         generator.generate(listOfAnimals,"C:\\Users\\kulkah\\Desktop\\pliki\\jakasnazwa");
-        //generator.read(new Cat(),"C:\\Users\\kulkah\\Desktop\\pliki\\jakasnazwa");
+        generator.read(new Cat(),"C:\\Users\\kulkah\\Desktop\\pliki\\jakasnazwa");
     }
 }

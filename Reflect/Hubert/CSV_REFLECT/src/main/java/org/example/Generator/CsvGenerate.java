@@ -13,6 +13,7 @@ import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
 import java.util.List;
+import java.util.stream.Collectors;
 
 
 @AllArgsConstructor
@@ -146,15 +147,17 @@ public class CsvGenerate implements CsvGenerator<Object> {
             String[] splitedLine = line.split(", ");
             System.out.println((Arrays.toString(splitedLine)));
             List<Object> splitedLineList = new ArrayList<>();
-
+            Object[] objects = new Object[splitedLine.length];
 
             for (int i = 0; i < classFields.size(); i++) {
                 splitedLineList.add(convertValue(classFields.get(i).getType(), splitedLine[i]));
+                objects[i] =  convertValue(classFields.get(i).getType(), splitedLine[i]);
             }
 
-            System.out.println(splitedLineList);
-            System.out.println(constructor[0].newInstance());
 
+
+            System.out.println(Arrays.toString(constructor[0].getGenericParameterTypes()));
+            constructor[0].newInstance( objects);
         }
         reader.close();
     }
@@ -188,6 +191,8 @@ public class CsvGenerate implements CsvGenerator<Object> {
             classFields.addAll(superClassFields);
             supeClass = supeClass.getSuperclass();
         }
+
+        ////////////////////ODWROCIC KOLEJNOSC PÓl ( OD SPUER W DÓŁ NIE W DRUGA STONE
     }
 
     //    private void sortValues() {
