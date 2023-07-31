@@ -28,16 +28,16 @@ public class Main {
 
 
         List listOfAnimals = List.of(
-                new Cat(true,"Pies", 4, Color.BLACK),
-                new Cat(true,"Kangur", 2,Color.BLUE),
-                new Cat(true,"Kot", 4,Color.CYAN),
-                new Cat(false,"Chomik", 4,Color.GRAY),
-                new Cat(false,"Niewiem", 3,Color.green)
+                new Cat(true,"Pies", 4, "Black"),
+                new Cat(true,"Kangur", 2,"Blue"),
+                new Cat(true,"Kot", 4,"Cyan"),
+                new Cat(false,"Chomik", 4,"Grey"),
+                new Cat(false,"Niewiem", 3,"Green")
         );
 
         //@IgnoreLists
         CsvGenerate generator = new CsvGenerate();
         generator.generate(listOfAnimals,"C:\\Users\\kulkah\\Desktop\\pliki\\jakasnazwa");
-       // generator.read(new Cat(),"C:\\Users\\kulkah\\Desktop\\pliki\\jakasnazwa");
+        //generator.read(new Cat(),"C:\\Users\\kulkah\\Desktop\\pliki\\jakasnazwa");
     }
 }

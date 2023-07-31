@@ -10,5 +10,5 @@ import java.util.List;
 @AllArgsConstructor
 public class CsvData<T extends Object> {
 
-    List<T> listOfObjects;
+    List<?> listOfObjects;
 }

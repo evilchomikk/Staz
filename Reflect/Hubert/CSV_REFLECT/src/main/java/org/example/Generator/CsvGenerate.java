@@ -12,7 +12,8 @@ import java.lang.reflect.InvocationTargetException;
 import java.time.LocalDate;
 import java.time.format.DateTimeFormatter;
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.List;
+
 
 @AllArgsConstructor
 @NoArgsConstructor
@@ -21,6 +22,7 @@ public class CsvGenerate implements CsvGenerator<Object> {
 
     CsvData<?> csvData;
     private List<Field> classFields;
+
     @Override
     public void generate(List list, String targetLoc) throws IOException {
 
@@ -32,6 +34,7 @@ public class CsvGenerate implements CsvGenerator<Object> {
 
             System.out.println();
             getFields();
+            sortValues();
             getColTitles(writer);
             getRowValues(writer);
         }
@@ -71,9 +74,6 @@ public class CsvGenerate implements CsvGenerator<Object> {
 
         GetAmmount getAmmount;
         // Field sortByField = null;
-
-
-
 
 
         if (!csvData.getListOfObjects().get(0).getClass().isAnnotationPresent(DontGenerate.class))
@@ -132,16 +132,14 @@ public class CsvGenerate implements CsvGenerator<Object> {
     }
 
 
-    public void read(Object obj, String sourceLoc) throws IOException, NoSuchMethodException, InvocationTargetException, InstantiationException, IllegalAccessException {
+    public void read(Object obj, String sourceLoc) throws IOException, InvocationTargetException, InstantiationException, IllegalAccessException {
 
         FileReader scan = new FileReader(sourceLoc + ".csv");
         BufferedReader reader = new BufferedReader(scan);
 
         Class<?> aClass = obj.getClass();
-        Field[] fields = aClass.getDeclaredFields();
         Constructor<?>[] constructor = aClass.getConstructors();
         var line = reader.readLine();//omija 1 linie
-        Class[] niewiem = constructor[0].getParameterTypes();
 
 
         while ((line = reader.readLine()) != null) {
@@ -150,16 +148,12 @@ public class CsvGenerate implements CsvGenerator<Object> {
             List<Object> splitedLineList = new ArrayList<>();
 
 
-            for (int i = 0; i < fields.length; i++) {
-                splitedLineList.add(convertValue(fields[i].getType(), splitedLine[i]));
+            for (int i = 0; i < classFields.size(); i++) {
+                splitedLineList.add(convertValue(classFields.get(i).getType(), splitedLine[i]));
             }
 
             System.out.println(splitedLineList);
-            System.out.println( constructor[0].newInstance(splitedLineList.get(0),splitedLineList.get(1),splitedLineList.get(2),splitedLineList.get(3)));
-
-
-            //JAK WSTAWIC W ARGUMENTY TA TABLICE PODZIELONA
-
+            System.out.println(constructor[0].newInstance());
 
         }
         reader.close();
@@ -175,26 +169,87 @@ public class CsvGenerate implements CsvGenerator<Object> {
                 return Boolean.parseBoolean(value);
             } else if (fieldType == String.class) {
                 return String.valueOf(value);
-                // For other types, you might need additional handling
-                // For this example, we assume all other fields are of type String
             } else {
                 return null;
             }
-        }catch (Exception e){
+        } catch (Exception e) {
             return null;
         }
 
     }
-    private void getFields(){
+
+    private void getFields() {
         classFields = new ArrayList<>(List.of(csvData.getListOfObjects().get(0).getClass().getDeclaredFields()));
-        List<Field> superClassFields ;
+        List<Field> superClassFields;
 
         Class supeClass = csvData.getListOfObjects().get(0).getClass().getSuperclass();
-        while(supeClass != Object.class){
+        while (supeClass != Object.class) {
             superClassFields = List.of(supeClass.getDeclaredFields());
             classFields.addAll(superClassFields);
             supeClass = supeClass.getSuperclass();
         }
     }
+
+    //    private void sortValues() {
+//
+//        List<Object> fieldValues = new ArrayList<>();
+//        AtomicInteger fieldIndex = new AtomicInteger();
+//        csvData.getListOfObjects().forEach(obj -> {
+//            classFields.forEach(field -> {
+//                field.setAccessible(true);
+//
+//                if (field.isAnnotationPresent(SortBy.class)) {
+//                    try {
+//                        fieldValues.add(field.get(obj));
+//                    } catch (IllegalAccessException e) {
+//                        throw new RuntimeException(e);
+//                    }
+//                    fieldIndex.set(classFields.indexOf(field));
+//                }
+//            });
+//        });
+//
+//        //fieldValues.sort((o1, o2) -> {if( o2.equals(o1))  return 0 ; else  return -1;} );
+//        //classFields.sort();
+//        List sortedValues = fieldValues.stream().sorted().toList();
+//        System.out.println(sortedValues);
+//        System.out.println(classFields);
+//
+//
+//    }
+    private void sortValues() {
+        if (csvData.getListOfObjects().isEmpty()) {
+            return;
+        }
+
+        Field sortByField = classFields.stream().filter(field -> field.isAnnotationPresent(SortBy.class)).findFirst().orElse(null);
+
+        if (sortByField == null) {
+            return;
+        }
+
+        sortByField.setAccessible(true);
+
+        List<Object> mutableList = new ArrayList<>(csvData.getListOfObjects());
+
+        mutableList.sort((o1, o2) -> {
+            try {
+                Object fieldValue1 = sortByField.get(o1);
+                Object fieldValue2 = sortByField.get(o2);
+
+                if (fieldValue1 instanceof Comparable) {
+                    return ((Comparable) fieldValue1).compareTo(fieldValue2);
+                } else {
+                    return 0;
+                }
+            } catch (IllegalAccessException e) {
+                throw new RuntimeException(e);
+            }
+        });
+
+        csvData.setListOfObjects(mutableList);
+    }
+
+
 }
 
