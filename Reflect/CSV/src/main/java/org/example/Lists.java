@@ -19,4 +19,14 @@ DateFormatImpl dateFormat = new DateFormatImpl();
             new Car("Ford",67871f,"blue",UUID.randomUUID(),dateFormat.dateFormat()),
             new Car("Ford",67871f,"blue",UUID.randomUUID(),dateFormat.dateFormat()),
             new Car("Ford",67871f,"blue",UUID.randomUUID(),dateFormat.dateFormat()));
+
+    List<Dog> underdogList = List.of(
+            new Underdog("Q",3,3456f,UUID.randomUUID(),dateFormat.dateFormat(),"underdog"),
+            new Underdog("W",4,3765f,UUID.randomUUID(),dateFormat.dateFormat(),"underdog"),
+            new Underdog("E",5,1459f,UUID.randomUUID(),dateFormat.dateFormat(),"underdog"));
+
+    List<Dog> underunderdogList = List.of(
+            new Underunderdog("Q",3,3456f,UUID.randomUUID(),dateFormat.dateFormat(),"underdog",3),
+            new Underunderdog("W",4,3765f,UUID.randomUUID(),dateFormat.dateFormat(),"underdog",2),
+            new Underunderdog("E",5,1459f,UUID.randomUUID(),dateFormat.dateFormat(),"underdog",4));
 }
